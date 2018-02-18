@@ -1,5 +1,6 @@
 package com.example.chiriku_alii.gmovie.api;
 
+import com.example.chiriku_alii.gmovie.model.DetailMovieResponse;
 import com.example.chiriku_alii.gmovie.model.GenreMovieResponse;
 import com.example.chiriku_alii.gmovie.model.MovieResponse;
 import com.example.chiriku_alii.gmovie.model.PopularMovieResponse;
@@ -20,9 +21,16 @@ public interface MovieApi {
     Call<PopularMovieResponse> getPopularMovies(
                         @Query("api_key") String apiKey,
                         @Query("page") String page);
+
+
     @GET("3/genre/movie/list?language=en-US")
     Call<GenreMovieResponse> getGenre(
                         @Query("api_key") String apiKey
 
+            );
+    @GET("3/movie/{movie_id}/videos?language=en-US")
+    Call<DetailMovieResponse> getDetailMovie(
+            @Path("movie_id") String movieId,
+            @Query("api_key") String apiKey
             );
 }

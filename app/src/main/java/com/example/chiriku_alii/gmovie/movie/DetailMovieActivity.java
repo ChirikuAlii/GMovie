@@ -1,7 +1,11 @@
 package com.example.chiriku_alii.gmovie.movie;
 
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Parcelable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +18,8 @@ import com.bumptech.glide.Glide;
 import com.example.chiriku_alii.gmovie.GMovie;
 import com.example.chiriku_alii.gmovie.R;
 import com.example.chiriku_alii.gmovie.api.YoutubePlayerApi;
+import com.example.chiriku_alii.gmovie.model.DetailMovieModel;
+import com.example.chiriku_alii.gmovie.model.DetailMovieResponse;
 import com.example.chiriku_alii.gmovie.model.GenreMovieModel;
 import com.example.chiriku_alii.gmovie.model.MovieModel;
 import com.example.chiriku_alii.gmovie.model.PopularMovieModel;
@@ -21,16 +27,25 @@ import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class DetailMovieActivity extends YouTubeBaseActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+import static android.util.Log.d;
+
+public class DetailMovieActivity extends AppCompatActivity {
+
+    private static final String TAG =DetailMovieModel.class.getSimpleName();
     Toolbar toolbar;
-    GenreMovieModel genreMovieModel ;
-    PopularMovieModel popularMovieModel;
+    List<DetailMovieModel> detailMovieModelList = new ArrayList<>();
 
-    TextView txtTitle ,txtDate,txtOverview;
+    FloatingActionButton fabPlay;
+    TextView txtTitle ,txtDate,txtOverview,txtRating;
     ImageView imageViewPoster ,imageViewBackdrop;
     YouTubePlayerView youTubePlayerView;
     YoutubePlayerApi youtubePlayerApi = new YoutubePlayerApi();
@@ -39,17 +54,29 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_movie);
-        String title,date,overview, urlImage,urlBackdrop;
+        String title,date,overview, urlImage,urlBackdrop,rating;
+        final Integer idMovie;
 
         txtTitle = findViewById(R.id.txt_view_detail_title);
         txtOverview =findViewById(R.id.txt_view_detail_synopsis);
         txtDate = findViewById(R.id.txt_view_detail_release_date);
+        txtRating = findViewById(R.id.txt_view_detail_rating);
+        fabPlay = findViewById(R.id.fab_play);
+
+
+
+
+
         imageViewPoster = findViewById(R.id.image_view_detail_movie);
         imageViewBackdrop = findViewById(R.id.image_view_detail_movie2);
 
         Intent intent =getIntent();
+        Intent appIntent = new Intent(Intent.ACTION_VIEW);
         title= intent.getStringExtra("title");
         date= intent.getStringExtra("date");
+        overview = intent.getStringExtra("overview");
+        rating = intent.getStringExtra("rating");
+        idMovie = intent.getIntExtra("id",0);
 
 
          urlImage = intent.getStringExtra("urlimage");
@@ -64,13 +91,52 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
 
         txtTitle.setText(title);
         txtDate.setText(date);
-        txtOverview.setText(""+popularMovieModel.getOriginalTitle());
+        txtOverview.setText(overview);
+        txtRating.setText("Average Rating:"+rating);
 
 
 
+        fabPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadTrailer(String.valueOf(idMovie));
 
+            }
+        });
 
+       // txtOverview.setText(""+popularMovieModel.getOriginalTitle());
 
+        
 
     }
+
+    private void watchYoutubeVideo(Context context, String id){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            context.startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            context.startActivity(webIntent);
+        }
+    }
+
+    private void loadTrailer(String idMovie){
+
+        GMovie.movieApi.getDetailMovie(idMovie,"3b980052023e8e6898f4578a6972740b").enqueue(new Callback<DetailMovieResponse>() {
+            @Override
+            public void onResponse(Call<DetailMovieResponse> call, Response<DetailMovieResponse> response) {
+                d("tag","detail movie response:"+new Gson().toJsonTree(response.body()));
+                detailMovieModelList.addAll(response.body().getResults());
+                watchYoutubeVideo(DetailMovieActivity.this,detailMovieModelList.get(0).getKey());
+            }
+
+
+            @Override
+            public void onFailure(Call<DetailMovieResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
 }

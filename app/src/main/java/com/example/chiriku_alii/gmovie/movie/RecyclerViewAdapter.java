@@ -1,16 +1,11 @@
 package com.example.chiriku_alii.gmovie.movie;
-import android.os.Bundle;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.chiriku_alii.gmovie.R;
@@ -19,7 +14,6 @@ import com.example.chiriku_alii.gmovie.model.PopularMovieModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -64,20 +58,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 String genre = null;
 
         final String title = popularMovieModel.getOriginalTitle();
-
          final String overview = popularMovieModel.getOverview();
          final String urlImage = popularMovieModel.getPosterPath();
          final String urlBackdrop = popularMovieModel.getBackdropPath();
+         final String rating = popularMovieModel.getVoteAverage();
+         final Integer id = popularMovieModel.getId();
 
 
-
-
-
-
-
-
-
-        holder.txtGenre.setText(searchGenre(position)+searchGenre(position+1));
+        holder.txtReleaseDate.setText(popularMovieModel.getReleaseDate());
 
         holder.txtTitle.setText(title);
         Glide.with(holder.itemView.getContext())
@@ -92,10 +80,11 @@ String genre = null;
             public void onClick(View v) {
                 Intent intent = new Intent(holder.itemView.getContext() , DetailMovieActivity.class);
                 intent.putExtra("title",title);
-
+                intent.putExtra("id",id);
                 intent.putExtra("overview",overview);
                 intent.putExtra("urlimage",urlImage);
                 intent.putExtra("urlBackdrop",urlBackdrop);
+                intent.putExtra("rating",rating);
 
                 holder.itemView.getContext().startActivity(intent);
 
@@ -118,13 +107,13 @@ String genre = null;
 
 
         ImageView imgPoster;
-        TextView txtTitle, txtGenre;
+        TextView txtTitle, txtReleaseDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imgPoster = itemView.findViewById(R.id.image_view_movie);
             txtTitle = itemView.findViewById(R.id.txt_view_title);
-            txtGenre = itemView.findViewById(R.id.txt_view_genre);
+            txtReleaseDate = itemView.findViewById(R.id.txt_view_release_date);
 
         }
     }

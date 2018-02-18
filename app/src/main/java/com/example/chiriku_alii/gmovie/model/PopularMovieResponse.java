@@ -13,12 +13,15 @@ public class PopularMovieResponse implements Parcelable
     @SerializedName("page")
     @Expose
     private int page;
+
     @SerializedName("total_results")
     @Expose
     private int totalResults;
+
     @SerializedName("total_pages")
     @Expose
     private int totalPages;
+
     @SerializedName("results")
     @Expose
     private List<PopularMovieModel> results = null;

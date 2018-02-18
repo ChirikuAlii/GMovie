@@ -76,20 +76,7 @@ public class MainActivity extends YouTubeBaseActivity {
 
             }
         });
-      GMovie.movieApi.getGenre("3b980052023e8e6898f4578a6972740b").enqueue(new Callback<GenreMovieResponse>() {
-          @Override
-          public void onResponse(Call<GenreMovieResponse> call, Response<GenreMovieResponse> response) {
-              d("tag","populer genre response :"+ new Gson().toJsonTree(response.body()));
 
-                genreMovieModelsList.addAll(response.body().getGenreMovieModel());
-              //Log.d(TAG,"isinya genre"+genreMovieModelsList.get(0).getName());
-          }
-
-          @Override
-          public void onFailure(Call<GenreMovieResponse> call, Throwable t) {
-
-          }
-      });
 
   }
 }
